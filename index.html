@@ -100,6 +100,12 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                         Edit Mode: {{ editMode }}
                     </label>
                 </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="createMode" id="ed2">
+                    <label class="form-check-label" for="ed2">
+                        Create Mode: {{ createMode }}
+                    </label>
+                </div>
                 <hr>
                 <h1>Datatables (penumpang)</h1>
                 <div>
@@ -107,6 +113,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                         url="http://192.168.146.23/apishinta/public/penumpang" 
                         token="token_pdtt"
                         :editable="editMode"
+                        :appendable="createMode"
+                        @create="doCreate"
                         @edit="doEdit" 
                         @view="doView" 
                         @delete="doDelete"></penumpang-datatable>
@@ -118,7 +126,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                         url="http://192.168.146.23/apishinta/public/dokumen/cd" 
                         token="token_pdtt" 
                         :editable="editMode" 
-                        :appendable="true"
+                        :appendable="createMode"
+                        @create="doCreate"
                         @edit="doEdit" 
                         @view="doView" 
                         @delete="doDelete"></cd-datatable>
@@ -194,8 +203,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                     },
                     initDatatable () {
                         var vm = this;
-                        // action button click handler
-                        $(this.$refs.tbl).on('click', 'button[data-action="view"], button[data-action="edit"], button[data-action="delete"]', function(e) {
+                        // action button click handler for buttons with data-action property set
+                        $(this.$el).on('click', 'button[data-action]', function(e) {
                             var action = $(e.currentTarget).data('action');
                             var id = $(e.currentTarget).data('id');
 
@@ -278,7 +287,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                 template: `
                     <div>
                         <div class="mb-2">
-                            <router-link to="/penumpang/new" class="btn btn-primary" v-if="appendable">Input Penumpang <i class="fa fa-plus-circle"></i></router-link>
+                            <button type="button" class="btn btn-primary" v-if="appendable" data-action="create" data-id="-1"><span>Input Penumpang <i class="fa fa-plus-circle"></i></span></button>
                         </div>
                         <table ref="tbl" class="table table-sm table-striped table-bordered dt-responsive" style="width:100%">
                             <thead>
@@ -410,7 +419,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                 template: `
                     <div>
                         <div class="mb-2">
-                            <router-link to="/cd/new" class="btn btn-primary" v-if="appendable">Input CD <i class="fa fa-plus-circle"></i></router-link>
+                            <button class="btn btn-primary" v-if="appendable" data-action="create" id="-1">Input CD <i class="fa fa-plus-circle"></i></button>
                         </div>
                         <table ref="tbl" class="table table-sm table-striped table-bordered dt-responsive" style="width:100%">
                             <thead>
@@ -563,6 +572,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                 el: '#app',
                 router,
                 data: {
+                    createMode: true,
                     editMode: false,
                     name: "Bowie",
                     tgl: '21-09-2019',
@@ -577,6 +587,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', e
                     },
                     doDelete: function (id) {
                         alert("Must delete data@"+id);
+                    },
+                    doCreate: function (id) {
+                        alert("Must create data@"+id);
                     }
                 }
             });
