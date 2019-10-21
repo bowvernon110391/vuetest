@@ -28,6 +28,56 @@
         <script src="vue.js"></script>
         <script src="vue-router.js"></script>
 
+        <style>
+
+            body {
+                /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#eeeeee+0,eeeeee+100;Grey+Flat */
+background: rgb(238,238,238); /* Old browsers */
+background: -moz-linear-gradient(-45deg,  rgba(238,238,238,1) 0%, rgba(238,238,238,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(-45deg,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(135deg,  rgba(238,238,238,1) 0%,rgba(238,238,238,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eeeeee', endColorstr='#eeeeee',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+            }
+
+            .dataTable thead tr {
+               /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#0082e5+0,173075+100 */
+background: rgb(0,130,229); /* Old browsers */
+background: -moz-linear-gradient(top,  rgba(0,130,229,1) 0%, rgba(23,48,117,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(0,130,229,1) 0%,rgba(23,48,117,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(0,130,229,1) 0%,rgba(23,48,117,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0082e5', endColorstr='#173075',GradientType=0 ); /* IE6-9 */
+
+                color: #eee;
+            }
+            .dataTable thead th {
+                text-align: center;
+                vertical-align: middle;
+                text-shadow: 0 0 8px 1px rgba(255, 255, 255, 0.8);
+            }
+            .dataTable thead tr:hover {
+                background-color: #944;
+                color: #fff;
+            }
+            .dataTable tbody tr:hover {
+                
+                /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#131313+0,1c1c1c+6,2b2b2b+15,474747+87,666666+94,4c4c4c+100&0.88+0,0.85+100 */
+background: -moz-linear-gradient(top,  rgba(19,19,19,0.88) 0%, rgba(28,28,28,0.88) 6%, rgba(43,43,43,0.88) 15%, rgba(71,71,71,0.85) 87%, rgba(102,102,102,0.85) 94%, rgba(76,76,76,0.85) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top,  rgba(19,19,19,0.88) 0%,rgba(28,28,28,0.88) 6%,rgba(43,43,43,0.88) 15%,rgba(71,71,71,0.85) 87%,rgba(102,102,102,0.85) 94%,rgba(76,76,76,0.85) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom,  rgba(19,19,19,0.88) 0%,rgba(28,28,28,0.88) 6%,rgba(43,43,43,0.88) 15%,rgba(71,71,71,0.85) 87%,rgba(102,102,102,0.85) 94%,rgba(76,76,76,0.85) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e0131313', endColorstr='#d94c4c4c',GradientType=0 ); /* IE6-9 */
+
+                color: #fff;
+            }
+            table.dataTable {
+                box-shadow: 1px 1px 8px 4px rgba(0, 0, 0, 0.2);
+                background-color: white;
+                border: 1px solid rgba(0,0,0,0.5);
+                border-collapse: collapse;
+                padding: 2px;
+                border-radius: 4px;
+            }
+        </style>
 
         <title>VUE Playground by Bowie</title>
     </head>
@@ -35,7 +85,6 @@
         <div id="app">
             <div class="container">
                 <h1>Datepicker</h1>
-                <router-link to="/about">go home</router-link>
                 <datepicker v-model="tgl"></datepicker>
                 <p>
                     The name inside is {{ name }}, and tgl = {{ tgl }}
@@ -45,12 +94,19 @@
                     <input type="text" v-model="tgl" class="form-control"/>
                 </div>
                 <hr>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" v-model="editMode" id="ed1">
+                    <label class="form-check-label" for="ed1">
+                        Edit Mode: {{ editMode }}
+                    </label>
+                </div>
+                <hr>
                 <h1>Datatables (penumpang)</h1>
                 <div>
                     <penumpang-datatable 
                         url="http://192.168.146.23/apishinta/public/penumpang" 
                         token="token_pdtt"
-                        :editable="true"
+                        :editable="editMode"
                         @edit="doEdit" 
                         @view="doView" 
                         @delete="doDelete"></penumpang-datatable>
@@ -61,7 +117,7 @@
                     <cd-datatable 
                         url="http://192.168.146.23/apishinta/public/dokumen/cd" 
                         token="token_pdtt" 
-                        :editable="true" 
+                        :editable="editMode" 
                         :appendable="true"
                         @edit="doEdit" 
                         @view="doView" 
@@ -101,6 +157,10 @@
                     appendable: {
                         type: Boolean,
                         default: true
+                    },
+                    addNewText: {
+                        type: String,
+                        default: ''
                     }
                 },
                 data: function() {
@@ -109,8 +169,11 @@
                     };
                 },
                 methods: {
-                    refresh: function() {
+                    redraw: function() {
                         this.dt.draw();
+                    },
+                    refresh: function() {
+                        this.dt.ajax.reload();
                     },
                     spawnDataControl: function(data) {
                         var html='<div class="btn-group" role="group">'
@@ -142,6 +205,11 @@
                             // alert(JSON.stringify(e));
                             // console.log(e);
                         });
+                    }
+                },
+                watch: {
+                    editable: function() {
+                        this.redraw();
                     }
                 }
             };
@@ -212,7 +280,7 @@
                         <div class="mb-2">
                             <router-link to="/penumpang/new" class="btn btn-primary" v-if="appendable">Input Penumpang <i class="fa fa-plus-circle"></i></router-link>
                         </div>
-                        <table ref="tbl" class="table table-striped table-bordered dt-responsive" style="width:100%">
+                        <table ref="tbl" class="table table-sm table-striped table-bordered dt-responsive" style="width:100%">
                             <thead>
                                 <tr>
                                     <th>Nama</th>
@@ -382,6 +450,10 @@
                             data: function(d) {
                                 var page = Math.ceil(d.start/d.length) + 1;
 
+                                // save it
+                                d.q = d.search.value;
+                                d.number = d.length;
+                                d.page = d.page;
                                 // console.log(d);
 
                                 return "q=" + d.search.value + "&number=" + d.length + "&page=" + page;
@@ -491,7 +563,7 @@
                 el: '#app',
                 router,
                 data: {
-                    counter: 0,
+                    editMode: false,
                     name: "Bowie",
                     tgl: '21-09-2019',
                     token: 'token_admin'
